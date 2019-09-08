@@ -9,6 +9,11 @@ def factorial(n: int): int {
 }
 
 def main(): int {
-  factorial(input('enter a number: '));
+  int n = input('enter a number: ');
+  println();
+  print('fact(');
+  print(n);
+  print(') = ');
+  print(factorial(n));
   return 0;
 }
