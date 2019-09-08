@@ -57,7 +57,7 @@ public final class Lexer implements java_cup.runtime.Scanner {
    * Translates characters to character classes
    */
   private static final String ZZ_CMAP_PACKED =
-    "\11\0\1\47\1\43\1\45\1\45\1\44\22\0\1\47\1\16\1\0"+
+    "\11\0\1\47\1\43\1\45\1\45\1\44\22\0\1\47\1\16\1\41"+
     "\1\46\1\0\1\0\1\0\1\41\1\1\1\2\1\12\1\10\1\6"+
     "\1\11\1\0\1\13\12\37\1\3\1\7\1\14\1\15\3\0\32\40"+
     "\1\0\1\42\2\0\1\40\1\0\1\36\1\25\1\40\1\17\1\20"+
@@ -836,7 +836,7 @@ public final class Lexer implements java_cup.runtime.Scanner {
           case 64: break;
           case 24:
             { yybegin(YYINITIAL);
-    String str = "\"" + text.toString() + "\"";
+    String str = text.toString();
     if (length > 1024) {
       return symbol(Token.ERROR, "string constant too long");
     }
