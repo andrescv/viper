@@ -32,6 +32,27 @@ public final class Constants {
   /** integer constants */
   private static final HashMap<String, Integer> integers = new HashMap<>();
 
+
+  /**
+   * Returns the label that represents the given string value.
+   *
+   * @param val string value
+   * @return label that represents the given string value
+   */
+  public static String getStringLabel(String val) {
+    return String.format("str_const%d", strings.get(val));
+  }
+
+  /**
+   * Returns the label that represents the given int value.
+   *
+   * @param val int value
+   * @return label that represents the given int value
+   */
+  public static String getIntLabel(String val) {
+    return String.format("int_const%d", integers.get(val));
+  }
+
   /**
    * Adds a string in the table.
    *
