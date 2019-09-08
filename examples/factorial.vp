@@ -1,0 +1,14 @@
+def factorial(n: int): int {
+  int result = 0;
+  if (n < 2) {
+    result = 1;
+  } else {
+    result = n * factorial(n - 1);
+  }
+  return result;
+}
+
+def main(): int {
+  factorial(input('enter a number: '));
+  return 0;
+}
