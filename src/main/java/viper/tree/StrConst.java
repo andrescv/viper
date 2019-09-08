@@ -25,17 +25,16 @@ import java.util.HashMap;
 
 import viper.misc.CgenSupport;
 import viper.misc.Counter;
-import viper.misc.Symbol;
+import viper.misc.Constants;
 import viper.misc.SymbolTable;
-import viper.misc.Symbols;
 import viper.misc.Type;
 
 
 /** Represents a string literal. */
 public final class StrConst extends Expression {
 
-  /** string symbol */
-  private final Symbol sym;
+  /** string value */
+  private final String val;
 
   /**
    * Creates a new string expression.
@@ -46,7 +45,8 @@ public final class StrConst extends Expression {
    */
   public StrConst(int line, int col, String val) {
     super(line, col);
-    sym = Symbols.table.addString(val);
+    this.val = val;
+    Constants.addString(val);
   }
 
   /** {@inheritDoc} */
@@ -64,7 +64,7 @@ public final class StrConst extends Expression {
   /** {@inheritDoc} */
   @Override
   public void dump(PrintStream p, int pad) {
-    p.println(pad(pad) + sym);
+    p.println(pad(pad) + val);
     p.println(pad(pad) + ":" + getType());
   }
 
