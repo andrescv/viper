@@ -1,0 +1,57 @@
+// project plugins
+plugins {
+  id 'java'
+  id 'com.diffplug.gradle.spotless' version '3.24.2'
+}
+
+// Viper version
+version = '1.1'
+
+// dependencies repositories
+repositories {
+  mavenCentral()
+}
+
+// compile and test dependencies
+dependencies {
+  compile 'commons-io:commons-io:2.6'
+  compile 'commons-cli:commons-cli:1.4'
+  compile files('lib/java-cup-11b-runtime.jar')
+}
+
+// jar configuration
+jar {
+  baseName = 'Viper'
+  manifest {
+    attributes (
+      'Main-Class': 'viper.Viper',
+      'Implementation-Title': 'Viper',
+      'Implementation-Version': version
+    )
+  }
+  // create fat jar
+  from {
+    configurations.runtimeClasspath.collect {
+      it.isDirectory() ? it : zipTree(it)
+    }
+  }
+}
+
+// spotless configuration
+spotless {
+  java {
+    licenseHeaderFile 'gradle/spotless/HEADER'
+    importOrder 'java', 'javafx', 'com', 'org', 'viper'
+    removeUnusedImports()
+    trimTrailingWhitespace()
+    indentWithSpaces(2)
+    endWithNewline()
+  }
+}
+
+// java source and target compatibility
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+// compile java source code in UTF-8
+compileJava.options.encoding = 'UTF-8'

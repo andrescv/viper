@@ -1,3 +1,7 @@
+# Build directory
+build/
+bin/
+
 # Compiled class file
 *.class
 
@@ -21,3 +25,13 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+# avoid ignoring project dependencies
+!java-cup-11b-runtime.jar
+!java-cup-11b.jar
+!jflex-full-1.7.0.jar
+
+# gradle
+.gradle
+gradle-app.setting
+.gradletasknamecache
