@@ -91,7 +91,6 @@ public final class Constants {
     p.println(CgenSupport.TRUE + CgenSupport.LABEL);
     p.println(CgenSupport.WORD + "1");
     // code string constants
-    CgenSupport.emitAlign(p);
     for (String key : strings.keySet()) {
       CgenSupport.emitLabelDef(String.format("str_const%d", strings.get(key)), p);
       CgenSupport.emitStringConstant(key, p);
