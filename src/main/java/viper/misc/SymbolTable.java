@@ -55,7 +55,7 @@ public class SymbolTable {
    */
   public void add(String id, Object value) {
     if (!table.isEmpty()) {
-      table.peek().put(id, type);
+      table.peek().put(id, value);
     }
   }
 
