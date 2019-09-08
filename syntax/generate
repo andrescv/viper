@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+
+# remove old files
+rm -f src/main/java/viper/syntax/Lexer.java
+rm -f src/main/java/viper/syntax/Parser.java
+rm -f src/main/java/viper/syntax/Token.java
+
+# generate lexer and parser
+java -jar lib/jflex-full-1.7.0.jar syntax/lexer.flex -d src/main/java/viper/syntax/
+java -jar lib/java-cup-11b.jar -parser Parser -symbols Token -destdir src/main/java/viper/syntax syntax/parser.cup

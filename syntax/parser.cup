@@ -116,6 +116,9 @@ parser code {:
     int l = token.left;
     int c = token.right;
     String t = Token.terminalNames[token.sym].toLowerCase();
+    if (t.equals("id") || t.equals("integer") || t.equals("string") || t.equals("boolean")) {
+      t = token.value.toString();
+    }
     System.err.println(String.format("%d:%d: parse error at or near: %s", l, c, t));
     try {
       Stream<String> lines = Files.lines(file.toPath());
