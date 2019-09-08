@@ -102,6 +102,17 @@ public final class SemantErrors {
   }
 
   /**
+   * Semant error when a formal parameter is multiply defined.
+   *
+   * @param line error line
+   * @param col error column
+   * @param name formal name
+   */
+  public static void formalIsAlreadyDefined(int line, int col, String name) {
+    print(line, col, String.format("formal parameter %s is already defined", name));
+  }
+
+  /**
    * Semant error for binary operators.
    *
    * @param line error line
