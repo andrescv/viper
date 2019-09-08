@@ -33,7 +33,7 @@ public final class CgenSupport {
   public static final String NEWLINE = System.getProperty("line.separator");
 
   /** word size */
-  public static final int WORD_SIZE     = 4;
+  public static final int WORD_SIZE = 4;
 
   /** .data directive */
   public static final String DATA = "  .data";
@@ -52,6 +52,9 @@ public final class CgenSupport {
   public static final String DEF = "def_";
   /** label symbol */
   public static final String LABEL = ":";
+
+  /** Div by zero exception */
+  public static final String DIV_BY_ZERO = "_div_by_zero";
 
   /** main function label */
   public static final String MAIN = "def_main";
