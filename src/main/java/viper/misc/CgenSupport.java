@@ -66,8 +66,8 @@ public final class CgenSupport {
   public static final String A0 = "a0";
   /** t1 register (temporary 1) */
   public static final String T1 = "t1";
-  /** s1 register (save register 1) */
-  public static final String S1 = "s1";
+  /** t2 register (temporary 2) */
+  public static final String T2 = "t2";
   /** sp register (stack pointer) */
   public static final String SP = "sp";
   /** fp register (frame pointer) */
