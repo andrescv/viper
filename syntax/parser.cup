@@ -1,0 +1,305 @@
+package viper.syntax;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.stream.Stream;
+import java.io.FileNotFoundException;
+
+import java_cup.runtime.Symbol;
+
+import viper.tree.*;
+import viper.misc.Type;
+
+
+/*
+  Viper Grammar
+
+  <program>     ::= <functions>
+
+  <functions>   ::= <functions> <function>
+                  | <function>
+
+  <function>    ::= def id ( <formals> ) : <type> { <statements> <return> }
+
+  <formals>     ::= <formals> , <formal>
+                  | <formal>
+                  | epsilon
+
+  <formal>      ::= id : <type>
+
+  <rtype>       ::= int
+                  | bool
+                  | str
+                  | void
+
+  <dtype>       ::= int
+                  | bool
+                  | str
+
+  <statements>  ::= <statements> <statement>
+                  | <statement>
+                  | epsilon
+
+  <statement>   ::= <expr> ;
+                  | if ( <expr> ) { <statements> } else { <statements> }
+                  | while ( <expr> ) { <statements> }
+                  | <dtype> id = <expr> ;
+
+  <expr>        ::= <expr> + <expr>
+                  | <expr> - <expr>
+                  | <expr> * <expr>
+                  | <expr> / <expr>
+                  | <expr> % <expr>
+                  | <expr> < <expr>
+                  | <expr> <= <expr>
+                  | <expr> == <expr>
+                  | id = <expr>
+                  | ! <expr>
+                  | ( <expr> )
+                  | id ( <actuals> )
+                  | id
+                  | integer
+                  | string
+                  | true
+                  | false
+
+  <actuals>     ::= <actuals> , <expr>
+                  | <expr>
+                  | epsilon
+*/
+
+parser code {:
+
+  /** input file */
+  private File file;
+
+  /**
+   * Creates a new Parser.
+   *
+   * @param file Viper file to parse
+   */
+  @SuppressWarnings("deprecation")
+  public Parser(File file) throws Exception {
+    super(new Lexer(new FileReader(file)));
+    this.file = file;
+  }
+
+  /**
+   * Parses a Viper program.
+   *
+   * @param file Viper file to parse
+   * @return Program node
+   */
+  public static Program parse(File file) {
+    try {
+      Parser parser = new Parser(file);
+      Symbol result = parser.parse();
+      return (Program) result.value;
+    } catch (FileNotFoundException e) {
+      System.err.println(String.format("File '%s' not found", file.toString()));
+      System.exit(-1);
+    } catch (IOException e) {
+      System.err.println("Compilation halted due to I/O errors");
+      System.exit(-1);
+    } catch (Exception e) {
+      System.err.println("Compilation halted due to unexpected exception");
+      System.exit(-1);
+    }
+    return null;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void syntax_error(Symbol token) {
+    int l = token.left;
+    int c = token.right;
+    String t = Token.terminalNames[token.sym].toLowerCase();
+    System.err.println(String.format("%d:%d: parse error at or near: %s", l, c, t));
+    try {
+      Stream<String> lines = Files.lines(file.toPath());
+      String source = lines.skip(l - 1).findFirst().get();
+      String pad = "^";
+      for (int i = 0; i < c - 1; i++) {
+        pad = " " + pad;
+      }
+      System.err.println();
+      System.err.println(source);
+      System.err.println(pad);
+    } catch (IOException e) { }
+    System.err.println("Compilation halted due to syntax errors");
+    System.exit(1);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void unrecovered_syntax_error(Symbol token) {
+    /* DO NOTHING */
+  }
+
+:};
+
+/*  TERMINALS */
+terminal ERROR;
+
+// keywords
+terminal DEF, INT, BOOL, STR, VOID, IF, ELSE, WHILE, RETURN;
+
+// syntax
+terminal LPAREN, RPAREN, COLON, LBRACE, RBRACE, COMMA, SEMI;
+terminal PLUS, MINUS, TIMES, DIV, MOD, LT, LE, EQ, NOT, ASSIGN;
+
+// identifiers
+terminal String ID;
+// numbers
+terminal String INTEGER;
+// strings
+terminal String STRING;
+// booleans
+terminal Boolean BOOLEAN;
+
+/** NON TERMINALS */
+non terminal Program program;
+non terminal Functions functions;
+non terminal Function function;
+non terminal Formals formals, params;
+non terminal Formal formal;
+non terminal Type rtype, dtype;
+non terminal Statements statements, stmts;
+non terminal Statement statement;
+non terminal Expression ret, expr;
+non terminal Actuals actuals, args;
+
+// operators precedence
+precedence right ASSIGN;
+precedence left EQ;
+precedence left LT, LE;
+precedence left MINUS, PLUS;
+precedence left TIMES, DIV, MOD;
+precedence right NOT;
+precedence left LPAREN, RPAREN;
+
+/* BNF GRAMMAR */
+
+program     ::= functions:l
+                {: RESULT = new Program(file, l); :}
+              ;
+
+functions   ::= functions:l function:f
+                {: RESULT = l.add(f); :}
+              | function:f
+                {: RESULT = (new Functions()).add(f); :}
+              ;
+
+function    ::= DEF ID:id LPAREN formals:f RPAREN COLON rtype:t LBRACE statements:s ret:r RBRACE
+                {: RESULT = new Function(idleft, idright, id, f, t, s, r); :}
+              ;
+
+formals     ::= params:l
+                {: RESULT = l; :}
+              |
+                {: RESULT = new Formals(); :}
+              ;
+
+params      ::= params:l COMMA formal:f
+                {: RESULT = l.add(f); :}
+              | formal:f
+                {: RESULT = (new Formals()).add(f); :}
+              ;
+
+formal      ::= ID:id COLON dtype:t
+                {: RESULT = new Formal(idleft, idright, id, t); :}
+              ;
+
+rtype        ::= INT
+                {: RESULT = Type.INT; :}
+              | BOOL
+                {: RESULT = Type.BOOL; :}
+              | STR
+                {: RESULT = Type.STR; :}
+              | VOID
+                {: RESULT = Type.VOID; :}
+              ;
+
+dtype        ::= INT
+                {: RESULT = Type.INT; :}
+              | BOOL
+                {: RESULT = Type.BOOL; :}
+              | STR
+                {: RESULT = Type.STR; :}
+              ;
+
+statements  ::= stmts:l
+                {: RESULT = l; :}
+              |
+                {: RESULT = new Statements(); :}
+              ;
+
+stmts       ::= stmts:l statement:s
+                {: RESULT = l.add(s); :}
+              | statement:s
+                {: RESULT = (new Statements()).add(s); :}
+              ;
+
+statement   ::= expr:e SEMI
+                {: RESULT = e; :}
+              | IF:i LPAREN expr:e RPAREN LBRACE statements:tp RBRACE ELSE LBRACE statements:ep RBRACE
+                {: RESULT = new If(ileft, iright, e, tp, ep); :}
+              | WHILE:i LPAREN expr:e RPAREN LBRACE statements:s RBRACE
+                {: RESULT = new While(ileft, iright, e, s); :}
+              | dtype:t ID:id ASSIGN expr:e SEMI
+                {: RESULT = new Declaration(idleft, idright, t, id, e); :}
+              ;
+
+ret         ::= RETURN:i expr:e SEMI
+                {: RESULT = new Return(ileft, iright, e); :}
+              |
+                {: RESULT = new NoReturn(-1, -1); :}
+              ;
+
+expr        ::= expr:e1 PLUS:i expr:e2
+                {: RESULT = new Add(ileft, iright, e1, e2); :}
+              | expr:e1 MINUS:i expr:e2
+                {: RESULT = new Sub(ileft, iright, e1, e2); :}
+              | expr:e1 TIMES:i expr:e2
+                {: RESULT = new Mul(ileft, iright, e1, e2); :}
+              | expr:e1 DIV:i expr:e2
+                {: RESULT = new Div(ileft, iright, e1, e2); :}
+              | expr:e1 MOD:i expr:e2
+                {: RESULT = new Mod(ileft, iright, e1, e2); :}
+              | expr:e1 LT:i expr:e2
+                {: RESULT = new LessThan(ileft, iright, e1, e2); :}
+              | expr:e1 LE:i expr:e2
+                {: RESULT = new LessEqual(ileft, iright, e1, e2); :}
+              | expr:e1 EQ:i expr:e2
+                {: RESULT = new Equal(ileft, iright, e1, e2); :}
+              | ID:id ASSIGN expr:e
+                {: RESULT = new Assign(idleft, idright, id, e); :}
+              | NOT:i expr:e
+                {: RESULT = new Not(ileft, iright, e); :}
+              | LPAREN expr:e RPAREN
+                {: RESULT = e; :}
+              | ID:id LPAREN actuals:args RPAREN
+                {: RESULT = new Call(idleft, idright, id, args); :}
+              | ID:id
+                {: RESULT = new Id(idleft, idright, id); :}
+              | INTEGER:val
+                {: RESULT = new IntConst(valleft, valright, val); :}
+              | STRING:val
+                {: RESULT = new StrConst(valleft, valright, val); :}
+              | BOOLEAN:val
+                {: RESULT = new BoolConst(valleft, valright, val); :}
+              ;
+
+actuals     ::= args:l
+                {: RESULT = l; :}
+              |
+                {: RESULT = new Actuals(); :}
+              ;
+
+args        ::= args:l COMMA expr:e
+                {: RESULT = l.add(e); :}
+              | expr:e
+                {: RESULT = (new Actuals()).add(e); :}
+              ;
