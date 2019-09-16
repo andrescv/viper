@@ -49,6 +49,7 @@ public final class Viper {
     System.out.println("  -h, --help    show this help message and exit");
     System.out.println("  -s, --semant  stop compilation before codegen, dump AST to stdout and exit");
     System.out.println("  -g, --debug   enable debug flag");
+    System.exit(0);
   }
 
   /**
