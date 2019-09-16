@@ -81,6 +81,12 @@ public final class SemantErrors {
     return ERRORS != 0;
   }
 
+  /** Semant error when the main function is not defined in the program. */
+  public static void noMainFunction() {
+    System.err.println("error: no main function");
+    ERRORS++;
+  }
+
   /**
    * Semant error when the main function is declared with arguments.
    *
