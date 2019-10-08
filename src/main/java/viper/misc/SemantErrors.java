@@ -149,7 +149,7 @@ public final class SemantErrors {
    * @param t2 second type
    */
   public static void incomparableTypes(int line, int col, Type t1, Type t2) {
-    print(line, col, String.format("incomparable types %s. and %s", t1, t2));
+    print(line, col, String.format("incomparable types %s and %s", t1, t2));
   }
 
   /**
