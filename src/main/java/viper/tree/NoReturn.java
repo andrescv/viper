@@ -23,6 +23,7 @@ package viper.tree;
 import java.io.PrintStream;
 import java.util.HashMap;
 
+import viper.misc.CgenSupport;
 import viper.misc.Counter;
 import viper.misc.SymbolTable;
 import viper.misc.Type;
@@ -50,7 +51,7 @@ public final class NoReturn extends Expression {
   /** {@inheritDoc} */
   @Override
   public void code(Counter locals, SymbolTable O, PrintStream p) {
-    // NOTHING HERE :]
+    CgenSupport.emitLoadImm(CgenSupport.A0, 0, p);
   }
 
   /** {@inheritDoc} */
