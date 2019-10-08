@@ -96,13 +96,19 @@ public final class Program {
       )
     );
     // install all program functions
+    boolean main = false;
     for (int i = 0; i < functions.size(); i++) {
       Function f = functions.get(i);
+      main |= f.name.equals("main");
       if (M.containsKey(f.name)) {
         SemantErrors.functionIsAlreadyDefined(f.line, f.col, f.name);
       } else {
         M.put(f.name, f);
       }
+    }
+    // no main function
+    if (!main) {
+      SemantErrors.noMainFunction();
     }
     // call semant
     functions.semant(O, M);
